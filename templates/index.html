@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ site_name }}</title>
+    <meta name="description" content="{{ description }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header>
+    <h1>{{ site_name }}</h1>
+    <p>{{ description }}</p>
+</header>
+
+<main class="container">
+    {% for item in news %}
+    <article class="card">
+        {% if item.image %}
+            <img src="{{ item.image }}" alt="{{ item.title }}" class="news-image">
+        {% endif %}
+        <span class="tag">{{ item.category }}</span>
+        <h2>{{ item.title }}</h2>
+        <p>{{ item.summary }}</p>
+
+        <a href="{{ item.link }}" target="_blank" rel="noopener">
+            Read on {{ item.source }} →
+        </a>
+
+        <div class="credit">
+            Source: {{ item.source }}
+        </div>
+    </article>
+    {% endfor %}
+</main>
+
+<footer>
+    <p>© {{ year }} {{ site_name }}</p>
+    <nav>
+        <a href="{{ url_for('about') }}">About</a> |
+        <a href="{{ url_for('privacy') }}">Privacy Policy</a> |
+        <a href="{{ url_for('disclaimer') }}">Disclaimer</a>
+    </nav>
+</footer>
+
+</body>
+</html>
