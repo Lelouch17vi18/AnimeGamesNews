@@ -1,49 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ site_name }}</title>
-    <meta name="description" content="{{ description }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
+{% block content %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+<!-- HERO -->
+<section class="hero">
+  <h1>{{ site_name }}</h1>
+  <p>{{ description }}</p>
+</section>
 
-<header>
-    <h1>{{ site_name }}</h1>
-    <p>{{ description }}</p>
-</header>
+<!-- FEATURED SECTION -->
+{% if featured %}
+<section class="section">
+  <h2 class="section-title">🔥 Featured</h2>
 
-<main class="container">
+  <div class="featured-card">
+    {% if featured.image %}
+      <img src="{{ featured.image }}" alt="{{ featured.title }}">
+    {% endif %}
+
+    <div class="featured-content">
+      <span class="tag">{{ featured.category }}</span>
+      <h3>{{ featured.title }}</h3>
+      <p>{{ featured.summary }}</p>
+      <a href="{{ featured.link }}" target="_blank" rel="noopener">
+        Read on {{ featured.source }} →
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- LATEST GAMES -->
+{% if games_news %}
+<section class="section">
+  <h2 class="section-title">🎮 Latest Games</h2>
+
+  <div class="news-grid">
+    {% for item in games_news %}
+    <article class="news-card">
+      {% if item.image %}
+        <img src="{{ item.image }}" alt="{{ item.title }}">
+      {% endif %}
+      <div class="news-body">
+        <span class="tag">{{ item.category }}</span>
+        <h3>{{ item.title }}</h3>
+        <a href="{{ item.link }}" target="_blank" rel="noopener">Read →</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- LATEST ANIME -->
+{% if anime_news %}
+<section class="section">
+  <h2 class="section-title">🍥 Latest Anime</h2>
+
+  <div class="news-grid">
+    {% for item in anime_news %}
+    <article class="news-card">
+      {% if item.image %}
+        <img src="{{ item.image }}" alt="{{ item.title }}">
+      {% endif %}
+      <div class="news-body">
+        <span class="tag">{{ item.category }}</span>
+        <h3>{{ item.title }}</h3>
+        <a href="{{ item.link }}" target="_blank" rel="noopener">Read →</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ALL LATEST NEWS -->
+{% if news %}
+<section class="section">
+  <h2 class="section-title">📰 Latest News</h2>
+
+  <div class="news-grid">
     {% for item in news %}
-    <article class="card">
-        {% if item.image %}
-            <img src="{{ item.image }}" alt="{{ item.title }}" class="news-image">
-        {% endif %}
+    <article class="news-card">
+      {% if item.image %}
+        <img src="{{ item.image }}" alt="{{ item.title }}" class="news-image">
+      {% endif %}
+      <div class="news-body">
         <span class="tag">{{ item.category }}</span>
         <h2>{{ item.title }}</h2>
         <p>{{ item.summary }}</p>
-
         <a href="{{ item.link }}" target="_blank" rel="noopener">
-            Read on {{ item.source }} →
+          Read on {{ item.source }} →
         </a>
-
-        <div class="credit">
-            Source: {{ item.source }}
-        </div>
+        <div class="credit">Source: {{ item.source }}</div>
+      </div>
     </article>
     {% endfor %}
-</main>
+  </div>
+</section>
+{% endif %}
 
-<footer>
-    <p>© {{ year }} {{ site_name }}</p>
-    <nav>
-        <a href="{{ url_for('about') }}">About</a> |
-        <a href="{{ url_for('privacy') }}">Privacy Policy</a> |
-        <a href="{{ url_for('disclaimer') }}">Disclaimer</a>
-    </nav>
-</footer>
-
-</body>
-</html>
+{% endblock %}

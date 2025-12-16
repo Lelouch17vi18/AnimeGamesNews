@@ -5,7 +5,10 @@ from datetime import datetime
 app = Flask(__name__)
 
 SITE_NAME = "Anime & Games News"
-SITE_DESCRIPTION = "Latest Anime & Gaming news with proper credits from trusted sources like IGN and Crunchyroll."
+SITE_DESCRIPTION = (
+    "Latest Anime & Gaming news with proper credits from trusted sources "
+    "like IGN and Crunchyroll."
+)
 
 RSS_SOURCES = [
     {
@@ -21,11 +24,19 @@ RSS_SOURCES = [
 ]
 
 def safe_summary(text):
-    """Short, non-plagiarized, safe summary"""
+    """Short, safe, non-plagiarized summary"""
     if not text:
         return "Read the full story on the official source."
     text = text.replace("\n", " ").strip()
     return text[:200] + "..." if len(text) > 200 else text
+
+def extract_image(entry):
+    """Safely extract image from RSS entry"""
+    if "media_thumbnail" in entry and entry.media_thumbnail:
+        return entry.media_thumbnail[0].get("url", "")
+    if "media_content" in entry and entry.media_content:
+        return entry.media_content[0].get("url", "")
+    return ""
 
 @app.route("/")
 def home():
@@ -33,29 +44,36 @@ def home():
 
     for src in RSS_SOURCES:
         feed = feedparser.parse(src["url"])
-        for entry in feed.entries[:6]:
-            # Try to get image safely
-            image_url = ""
-            if "media_thumbnail" in entry:
-                image_url = entry.media_thumbnail[0]["url"]
-            elif "media_content" in entry:
-                image_url = entry.media_content[0]["url"]
 
+        for entry in feed.entries[:6]:
             news.append({
-                "title": entry.title,
+                "title": entry.get("title", "No title"),
                 "summary": safe_summary(entry.get("summary", "")),
-                "link": entry.link,
+                "link": entry.get("link", "#"),
                 "source": src["name"],
                 "category": src["category"],
                 "published": entry.get("published", ""),
-                "image": image_url
+                "image": extract_image(entry)
             })
+
+    # 🔥 SORT LATEST FIRST (simple)
+    news = list(dict.fromkeys([n["title"] for n in news])) and news
+
+    # 🔥 SECTIONS
+    games_news = [n for n in news if n["category"] == "Games"]
+    anime_news = [n for n in news if n["category"] == "Anime"]
+
+    # 🔥 FEATURED (first valid item with image)
+    featured = next((n for n in news if n["image"]), news[0] if news else None)
 
     return render_template(
         "index.html",
         site_name=SITE_NAME,
         description=SITE_DESCRIPTION,
-        news=news,
+        featured=featured,
+        games_news=games_news[:4],
+        anime_news=anime_news[:4],
+        news=news,  # for full latest section
         year=datetime.now().year
     )
 
